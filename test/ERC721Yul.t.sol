@@ -15,6 +15,13 @@ contract ERC721YulTest is Test {
 
     address user1 = address(0x1);
     address user2 = address(0x2);
+    address user3 = address(0x3);
+
+    event Transfer(
+        address indexed from,
+        address indexed to,
+        uint256 indexed tokenId
+    );
 
     function setUp() external {
         nftContract = new MyCollection();
@@ -39,7 +46,6 @@ contract ERC721YulTest is Test {
             nftContract.mint(user1, 4444);
 
             assertEq(nftContract.balanceOf(owner), 4);
-
             assertEq(nftContract.balanceOf(user1), 2);
         }
     }
@@ -54,11 +60,54 @@ contract ERC721YulTest is Test {
         assertEq(nftContract.ownerOf(tokenId), user1);
     }
 
-    event Transfer(
-        address indexed from,
-        address indexed to,
-        uint256 indexed tokenId
-    );
+    function testApprovalForAll(
+        address owner,
+        address operator,
+        bool approved
+    ) external {
+        vm.startPrank(owner);
+
+        if (owner == operator) {
+            // Should revert if current owner is receiving approval.
+            vm.expectRevert();
+            nftContract.setApprovalForAll(operator, approved);
+        } else {
+            nftContract.setApprovalForAll(operator, approved);
+
+            assertEq(nftContract.isApprovedForAll(owner, operator), approved);
+        }
+
+        vm.stopPrank();
+    }
+
+    function testApprove(uint256 tokenId) external {
+        // Should revert if token does not exist.
+        vm.expectRevert();
+        nftContract.getApproved(tokenId);
+
+        nftContract.mint(user1, tokenId);
+
+        vm.startPrank(user2);
+
+        // Should revert if caller is not owner nor operator.
+        vm.expectRevert();
+        nftContract.approve(user3, tokenId);
+
+        changePrank(user1);
+
+        nftContract.approve(user3, tokenId);
+        assertEq(nftContract.getApproved(tokenId), user3);
+
+        nftContract.setApprovalForAll(user3, true);
+
+        changePrank(user3);
+
+        // Should allow to approve because caller is operator.
+        nftContract.approve(user2, tokenId);
+        assertEq(nftContract.getApproved(tokenId), user2);
+
+        vm.stopPrank();
+    }
 
     function testMint(address to, uint256 tokenId) external {
         if (to == address(0)) {
