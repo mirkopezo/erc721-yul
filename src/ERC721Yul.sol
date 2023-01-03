@@ -38,7 +38,7 @@ contract ERC721Yul {
 
             let owner := sload(location)
 
-            // Revert if owner is zero address.
+            // Revert if token doesn't exist.
             if iszero(owner) {
                 revert(0x00, 0)
             }
@@ -77,8 +77,8 @@ contract ERC721Yul {
 
             let owner := sload(location)
 
-            // Revert if owner is zero address.
-            if iszero(owner) {
+            // Revert if token doesn't exist or current owner is receiving approval.
+            if or(iszero(owner), eq(owner, to)) {
                 revert(0x00, 0)
             }
 
@@ -110,6 +110,11 @@ contract ERC721Yul {
 
     function setApprovalForAll(address operator, bool approved) external {
         assembly {
+            // Revert if current owner is receiving approval.
+            if eq(caller(), operator) {
+                revert(0x00, 0)
+            }
+
             mstore(0x00, caller())
             mstore(0x20, _operatorApprovals.slot)
 
@@ -133,7 +138,7 @@ contract ERC721Yul {
 
             let owner := sload(location)
 
-            // Revert if owner is zero address.
+            // Revert if token doesn't exist.
             if iszero(owner) {
                 revert(0x00, 0)
             }
