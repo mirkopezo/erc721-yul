@@ -23,6 +23,18 @@ contract ERC721YulTest is Test {
         uint256 indexed tokenId
     );
 
+    event Approval(
+        address indexed owner,
+        address indexed approved,
+        uint256 indexed tokenId
+    );
+
+    event ApprovalForAll(
+        address indexed owner,
+        address indexed operator,
+        bool approved
+    );
+
     function setUp() external {
         nftContract = new MyCollection();
     }
@@ -72,6 +84,9 @@ contract ERC721YulTest is Test {
             vm.expectRevert();
             nftContract.setApprovalForAll(operator, approved);
         } else {
+            // Event should be emitted after approval.
+            vm.expectEmit(true, true, false, true, address(nftContract));
+            emit ApprovalForAll(owner, operator, approved);
             nftContract.setApprovalForAll(operator, approved);
 
             assertEq(nftContract.isApprovedForAll(owner, operator), approved);
@@ -95,6 +110,9 @@ contract ERC721YulTest is Test {
 
         changePrank(user1);
 
+        // Event should be emitted after approval.
+        vm.expectEmit(true, true, true, true, address(nftContract));
+        emit Approval(user1, user3, tokenId);
         nftContract.approve(user3, tokenId);
         assertEq(nftContract.getApproved(tokenId), user3);
 
