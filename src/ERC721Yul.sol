@@ -105,6 +105,17 @@ contract ERC721Yul {
             location := keccak256(0x00, 64)
 
             sstore(location, to)
+
+            // emit Approval(owner, to, tokenId)
+            log4(
+                0x00,
+                0,
+                // keccak256("Approval(address,address,uint256)")
+                0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925,
+                owner,
+                to,
+                tokenId
+            )
         }
     }
 
@@ -126,6 +137,18 @@ contract ERC721Yul {
             location := keccak256(0x00, 64)
 
             sstore(location, approved)
+
+            mstore(0x00, approved)
+
+            // emit ApprovalForAll(msg.sender, operator, approved)
+            log3(
+                0x00,
+                32,
+                // keccak256("ApprovalForAll(address,address,bool)")
+                0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31,
+                caller(),
+                operator
+            )
         }
     }
 
