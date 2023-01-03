@@ -204,7 +204,7 @@ contract ERC721Yul {
 
             sstore(location, bal)
 
-            // Emit 'Transfer' event.
+            // emit Transfer(address(0), to, tokenId)
             log4(
                 0x00,
                 0,
