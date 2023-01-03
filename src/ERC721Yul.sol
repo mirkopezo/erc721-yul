@@ -173,4 +173,47 @@ contract ERC721Yul {
             return(0x00, 32)
         }
     }
+
+    function _mint(address to, uint256 tokenId) internal {
+        assembly {
+            // Revert if mint to zero address.
+            if iszero(to) {
+                revert(0x00, 0)
+            }
+
+            mstore(0x00, tokenId)
+            mstore(0x20, _owners.slot)
+
+            let location := keccak256(0x00, 64)
+
+            let owner := sload(location)
+
+            // Revert if token already exists.
+            if owner {
+                revert(0x00, 0)
+            }
+
+            sstore(location, to)
+
+            mstore(0x00, to)
+            mstore(0x20, _balances.slot)
+
+            location := keccak256(0x00, 64)
+
+            let bal := add(sload(location), 1)
+
+            sstore(location, bal)
+
+            // Emit 'Transfer' event.
+            log4(
+                0x00,
+                0,
+                // keccak256("Transfer(address,address,uint256)")
+                0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef,
+                0,
+                to,
+                tokenId
+            )
+        }
+    }
 }
