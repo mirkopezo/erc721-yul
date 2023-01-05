@@ -141,23 +141,15 @@ contract ERC721Yul {
             mstore(0x00, tokenId)
             mstore(0x20, _owners.slot)
 
-            let location := keccak256(0x00, 64)
-
-            let owner := sload(location)
-
             // Revert if token doesn't exist.
-            if iszero(owner) {
+            if iszero(sload(keccak256(0x00, 64))) {
                 revert(0x00, 0)
             }
 
             mstore(0x00, tokenId)
             mstore(0x20, _tokenApprovals.slot)
 
-            location := keccak256(0x00, 64)
-
-            let approved := sload(location)
-
-            mstore(0x00, approved)
+            mstore(0x00, sload(keccak256(0x00, 64)))
 
             return(0x00, 32)
         }
