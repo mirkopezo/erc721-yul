@@ -120,9 +120,7 @@ contract ERC721Yul {
             mstore(0x00, operator)
             mstore(0x20, location)
 
-            location := keccak256(0x00, 64)
-
-            sstore(location, approved)
+            sstore(keccak256(0x00, 64), approved)
 
             mstore(0x00, approved)
 
