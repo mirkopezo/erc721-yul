@@ -19,11 +19,7 @@ contract ERC721Yul {
             mstore(0x00, owner)
             mstore(0x20, _balances.slot)
 
-            let location := keccak256(0x00, 64)
-
-            let bal := sload(location)
-
-            mstore(0x00, bal)
+            mstore(0x00, sload(keccak256(0x00, 64)))
 
             return(0x00, 32)
         }
