@@ -186,10 +186,8 @@ contract ERC721Yul {
 
             let location := keccak256(0x00, 64)
 
-            let owner := sload(location)
-
             // Revert if token already exists.
-            if owner {
+            if sload(location) {
                 revert(0x00, 0)
             }
 
@@ -200,9 +198,7 @@ contract ERC721Yul {
 
             location := keccak256(0x00, 64)
 
-            let bal := add(sload(location), 1)
-
-            sstore(location, bal)
+            sstore(location, add(sload(location), 1))
 
             // emit Transfer(address(0), to, tokenId)
             log4(
