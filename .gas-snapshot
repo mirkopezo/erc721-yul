@@ -1,5 +1,5 @@
-ERC721YulTest:testApprovalForAll(address,address,bool) (runs: 5000, μ: 22821, ~: 17005)
+ERC721YulTest:testApprovalForAll(address,address,bool) (runs: 5000, μ: 22814, ~: 16999)
 ERC721YulTest:testApprove(uint256) (runs: 5000, μ: 131491, ~: 131491)
-ERC721YulTest:testBalanceOf(address) (runs: 5000, μ: 208496, ~: 208817)
+ERC721YulTest:testBalanceOf(address) (runs: 5000, μ: 208536, ~: 208817)
 ERC721YulTest:testMint(address,uint256) (runs: 5000, μ: 60530, ~: 60582)
 ERC721YulTest:testOwnerOf(uint256) (runs: 5000, μ: 61121, ~: 61121)

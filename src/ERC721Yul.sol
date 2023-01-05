@@ -168,11 +168,7 @@ contract ERC721Yul {
             mstore(0x00, operator)
             mstore(0x20, location)
 
-            location := keccak256(0x00, 64)
-
-            let isApproved := sload(location)
-
-            mstore(0x00, isApproved)
+            mstore(0x00, sload(keccak256(0x00, 64)))
 
             return(0x00, 32)
         }
