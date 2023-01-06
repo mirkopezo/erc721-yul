@@ -15,7 +15,7 @@ mainnet = "https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}"
 
 [etherscan]
 goerli = { key = "${ETHERSCAN_API_KEY}" }
-polygon_mumbai = { key = "${ETHERSCAN_API_KEY}" }
+polygon_mumbai = { key = "${POLYGONSCAN_API_KEY}" }
 mainnet = { key = "${ETHERSCAN_API_KEY}" }
 
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config
