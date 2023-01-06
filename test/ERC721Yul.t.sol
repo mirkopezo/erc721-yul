@@ -146,4 +146,65 @@ contract ERC721YulTest is Test {
             nftContract.mint(to, tokenId);
         }
     }
+
+    function testTransferFrom(address to, uint256 tokenId) external {
+        nftContract.mint(user1, tokenId);
+
+        vm.startPrank(user1);
+
+        nftContract.approve(user3, tokenId);
+
+        if (to == address(0)) {
+            // Revert if 'to' is zero address.
+            vm.expectRevert();
+            nftContract.transferFrom(user1, to, tokenId);
+        } else {
+            // Event should be emitted after every transfer.
+            vm.expectEmit(true, true, true, true, address(nftContract));
+            emit Transfer(user1, to, tokenId);
+            nftContract.transferFrom(user1, to, tokenId);
+
+            assertEq(nftContract.ownerOf(tokenId), to);
+            // Token approvals should be cleared after every transfer.
+            assertEq(nftContract.getApproved(tokenId), address(0));
+
+            if (to == user1) {
+                assertEq(nftContract.balanceOf(user1), 1);
+            } else {
+                assertEq(nftContract.balanceOf(user1), 0);
+                assertEq(nftContract.balanceOf(to), 1);
+            }
+        }
+    }
+
+    function testTransferFrom(address randomCaller) external {
+        nftContract.mint(user1, 56);
+        nftContract.mint(user1, 75);
+        nftContract.mint(user1, 99);
+
+        vm.startPrank(user1);
+
+        nftContract.approve(user2, 56);
+        nftContract.setApprovalForAll(user3, true);
+
+        changePrank(user2);
+
+        nftContract.transferFrom(user1, user2, 56);
+
+        changePrank(user3);
+
+        nftContract.transferFrom(user1, user2, 75);
+
+        vm.expectRevert();
+        nftContract.transferFrom(user2, user3, 99);
+
+        vm.assume(randomCaller != address(0));
+        vm.assume(randomCaller != user1);
+        vm.assume(randomCaller != user3);
+
+        changePrank(randomCaller);
+
+        vm.expectRevert();
+        nftContract.transferFrom(user1, user2, 99);
+    }
 }
