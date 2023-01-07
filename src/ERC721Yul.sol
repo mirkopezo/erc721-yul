@@ -85,21 +85,21 @@ contract ERC721Yul {
             // delete _tokenApprovals[tokenId]
             sstore(tokenApprovalsLoc, 0)
 
+            sstore(ownerSlot, to)
+
             mstore(0x00, from)
             mstore(0x20, _balances.slot)
 
-            location := keccak256(0x00, 64)
+            let location2 := keccak256(0x00, 64)
 
-            sstore(location, sub(sload(location), 1))
+            sstore(location2, sub(sload(location2), 1))
 
             mstore(0x00, to)
             mstore(0x20, _balances.slot)
 
-            location := keccak256(0x00, 64)
+            let location3 := keccak256(0x00, 64)
 
-            sstore(location, add(sload(location), 1))
-
-            sstore(ownerSlot, to)
+            sstore(location3, add(sload(location3), 1))
 
             // emit Transfer(from, to, tokenId)
             log4(
@@ -233,9 +233,9 @@ contract ERC721Yul {
             mstore(0x00, to)
             mstore(0x20, _balances.slot)
 
-            location := keccak256(0x00, 64)
+            let location2 := keccak256(0x00, 64)
 
-            sstore(location, add(sload(location), 1))
+            sstore(location2, add(sload(location2), 1))
 
             // emit Transfer(address(0), to, tokenId)
             log4(
