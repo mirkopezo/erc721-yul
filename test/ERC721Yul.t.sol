@@ -17,23 +17,11 @@ contract ERC721YulTest is Test {
     address user2 = address(0x2);
     address user3 = address(0x3);
 
-    event Transfer(
-        address indexed from,
-        address indexed to,
-        uint256 indexed tokenId
-    );
+    event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
 
-    event Approval(
-        address indexed owner,
-        address indexed approved,
-        uint256 indexed tokenId
-    );
+    event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId);
 
-    event ApprovalForAll(
-        address indexed owner,
-        address indexed operator,
-        bool approved
-    );
+    event ApprovalForAll(address indexed owner, address indexed operator, bool approved);
 
     function setUp() external {
         nftContract = new MyCollection();
@@ -72,11 +60,7 @@ contract ERC721YulTest is Test {
         assertEq(nftContract.ownerOf(tokenId), user1);
     }
 
-    function testApprovalForAll(
-        address owner,
-        address operator,
-        bool approved
-    ) external {
+    function testApprovalForAll(address owner, address operator, bool approved) external {
         vm.startPrank(owner);
 
         if (owner == operator) {

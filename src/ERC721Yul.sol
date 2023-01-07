@@ -12,9 +12,7 @@ contract ERC721Yul {
     function balanceOf(address owner) external view returns (uint256) {
         assembly {
             // Revert if address is zero.
-            if iszero(owner) {
-                revert(0x00, 0)
-            }
+            if iszero(owner) { revert(0x00, 0) }
 
             mstore(0x00, owner)
             mstore(0x20, _balances.slot)
@@ -33,9 +31,7 @@ contract ERC721Yul {
             let owner := sload(keccak256(0x00, 64))
 
             // Revert if token doesn't exist.
-            if iszero(owner) {
-                revert(0x00, 0)
-            }
+            if iszero(owner) { revert(0x00, 0) }
 
             mstore(0x00, owner)
 
@@ -43,24 +39,14 @@ contract ERC721Yul {
         }
     }
 
-    function safeTransferFrom(
-        address from,
-        address to,
-        uint256 tokenId,
-        bytes memory data
-    ) external payable {}
+    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory data)
+        external
+        payable
+    {}
 
-    function safeTransferFrom(
-        address from,
-        address to,
-        uint256 tokenId
-    ) external payable {}
+    function safeTransferFrom(address from, address to, uint256 tokenId) external payable {}
 
-    function transferFrom(
-        address from,
-        address to,
-        uint256 tokenId
-    ) external payable {
+    function transferFrom(address from, address to, uint256 tokenId) external payable {
         assembly {
             mstore(0x00, tokenId)
             mstore(0x20, _owners.slot)
@@ -86,24 +72,15 @@ contract ERC721Yul {
             let isOperatorApproved := sload(keccak256(0x00, 64))
 
             // Revert if caller is not owner nor approved nor operator.
-            if iszero(
-                or(
-                    or(eq(owner, caller()), eq(approvedAddr, caller())),
-                    isOperatorApproved
-                )
-            ) {
+            if iszero(or(or(eq(owner, caller()), eq(approvedAddr, caller())), isOperatorApproved)) {
                 revert(0x00, 0)
             }
 
             // Revert if 'from' is not owner of token.
-            if iszero(eq(owner, from)) {
-                revert(0x00, 0)
-            }
+            if iszero(eq(owner, from)) { revert(0x00, 0) }
 
             // Revert if 'to' is zero address.
-            if iszero(to) {
-                revert(0x00, 0)
-            }
+            if iszero(to) { revert(0x00, 0) }
 
             // delete _tokenApprovals[tokenId]
             sstore(tokenApprovalsLoc, 0)
@@ -145,9 +122,7 @@ contract ERC721Yul {
             let owner := sload(keccak256(0x00, 64))
 
             // Revert if token doesn't exist or current owner is receiving approval.
-            if or(iszero(owner), eq(owner, to)) {
-                revert(0x00, 0)
-            }
+            if or(iszero(owner), eq(owner, to)) { revert(0x00, 0) }
 
             mstore(0x00, owner)
             mstore(0x20, _operatorApprovals.slot)
@@ -158,9 +133,7 @@ contract ERC721Yul {
             mstore(0x20, location)
 
             // Revert if caller is not owner nor operator.
-            if iszero(or(eq(caller(), owner), sload(keccak256(0x00, 64)))) {
-                revert(0x00, 0)
-            }
+            if iszero(or(eq(caller(), owner), sload(keccak256(0x00, 64)))) { revert(0x00, 0) }
 
             mstore(0x00, tokenId)
             mstore(0x20, _tokenApprovals.slot)
@@ -183,9 +156,7 @@ contract ERC721Yul {
     function setApprovalForAll(address operator, bool approved) external {
         assembly {
             // Revert if current owner is receiving approval.
-            if eq(caller(), operator) {
-                revert(0x00, 0)
-            }
+            if eq(caller(), operator) { revert(0x00, 0) }
 
             mstore(0x00, caller())
             mstore(0x20, _operatorApprovals.slot)
@@ -217,9 +188,7 @@ contract ERC721Yul {
             mstore(0x20, _owners.slot)
 
             // Revert if token doesn't exist.
-            if iszero(sload(keccak256(0x00, 64))) {
-                revert(0x00, 0)
-            }
+            if iszero(sload(keccak256(0x00, 64))) { revert(0x00, 0) }
 
             mstore(0x00, tokenId)
             mstore(0x20, _tokenApprovals.slot)
@@ -230,10 +199,7 @@ contract ERC721Yul {
         }
     }
 
-    function isApprovedForAll(
-        address owner,
-        address operator
-    ) external view returns (bool) {
+    function isApprovedForAll(address owner, address operator) external view returns (bool) {
         assembly {
             mstore(0x00, owner)
             mstore(0x20, _operatorApprovals.slot)
@@ -252,9 +218,7 @@ contract ERC721Yul {
     function _mint(address to, uint256 tokenId) internal {
         assembly {
             // Revert if mint to zero address.
-            if iszero(to) {
-                revert(0x00, 0)
-            }
+            if iszero(to) { revert(0x00, 0) }
 
             mstore(0x00, tokenId)
             mstore(0x20, _owners.slot)
@@ -262,9 +226,7 @@ contract ERC721Yul {
             let location := keccak256(0x00, 64)
 
             // Revert if token already exists.
-            if sload(location) {
-                revert(0x00, 0)
-            }
+            if sload(location) { revert(0x00, 0) }
 
             sstore(location, to)
 
