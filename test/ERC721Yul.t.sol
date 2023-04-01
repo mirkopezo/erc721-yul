@@ -3,6 +3,7 @@ pragma solidity 0.8.17;
 
 import "forge-std/Test.sol";
 import "../src/ERC721Yul.sol";
+import "../test/mocks/ERC721Receiver.sol";
 
 contract MyCollection is ERC721Yul {
     function mint(address to, uint256 tokenId) external {
@@ -12,6 +13,8 @@ contract MyCollection is ERC721Yul {
 
 contract ERC721YulTest is Test {
     MyCollection nftContract;
+    ERC721Receiver receiverContractAccept;
+    ERC721Receiver receiverContractDecline;
 
     address user1 = address(0x1);
     address user2 = address(0x2);
@@ -25,6 +28,8 @@ contract ERC721YulTest is Test {
 
     function setUp() external {
         nftContract = new MyCollection();
+        receiverContractAccept = new ERC721Receiver(true);
+        receiverContractDecline = new ERC721Receiver(false);
     }
 
     function testBalanceOf(address owner) external {
@@ -190,5 +195,66 @@ contract ERC721YulTest is Test {
 
         vm.expectRevert();
         nftContract.transferFrom(user1, user2, 99);
+    }
+
+    function testSafeTransferFrom(address from, address to, uint256 tokenId) external {
+        vm.assume(from != address(0) && to != address(0));
+        vm.assume(from != to);
+
+        nftContract.mint(from, tokenId);
+
+        assertEq(nftContract.balanceOf(from), 1);
+        assertEq(nftContract.balanceOf(to), 0);
+
+        vm.startPrank(from);
+
+        nftContract.safeTransferFrom(from, to, tokenId);
+
+        assertEq(nftContract.balanceOf(from), 0);
+        assertEq(nftContract.balanceOf(to), 1);
+    }
+
+    // function testSafeTransferFrom() external {
+    //     nftContract.mint(user1, 23);
+
+    //     assertEq(nftContract.balanceOf(user1), 1);
+    //     assertEq(nftContract.balanceOf(user2), 0);
+
+    //     vm.startPrank(user1);
+
+    //     nftContract.safeTransferFrom(user1, user2, 23);
+
+    //     assertEq(nftContract.balanceOf(user1), 0);
+    //     assertEq(nftContract.balanceOf(user2), 1);
+    // }
+
+    function testSafeTransferFromAccept() external {
+        address to = address(receiverContractAccept);
+
+        nftContract.mint(user1, 23);
+
+        assertEq(nftContract.balanceOf(user1), 1);
+        assertEq(nftContract.balanceOf(to), 0);
+
+        vm.startPrank(user1);
+
+        nftContract.safeTransferFrom(user1, to, 23);
+
+        assertEq(nftContract.balanceOf(user1), 0);
+        assertEq(nftContract.balanceOf(to), 1);
+    }
+
+    function testSafeTransferFromDecline() external {
+        address to = address(receiverContractDecline);
+
+        nftContract.mint(user1, 23);
+
+        assertEq(nftContract.balanceOf(user1), 1);
+        assertEq(nftContract.balanceOf(to), 0);
+
+        vm.startPrank(user1);
+
+        vm.expectRevert();
+        nftContract.safeTransferFrom(user1, to, 23);
     }
 }

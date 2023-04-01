@@ -10,5 +10,8 @@ out/
 # Ignores all broadcast logs
 /broadcast/
 
+# Ignore coverage report
+/report/
+
 # Dotenv file
 .env
