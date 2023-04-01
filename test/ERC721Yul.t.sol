@@ -214,20 +214,6 @@ contract ERC721YulTest is Test {
         assertEq(nftContract.balanceOf(to), 1);
     }
 
-    // function testSafeTransferFrom() external {
-    //     nftContract.mint(user1, 23);
-
-    //     assertEq(nftContract.balanceOf(user1), 1);
-    //     assertEq(nftContract.balanceOf(user2), 0);
-
-    //     vm.startPrank(user1);
-
-    //     nftContract.safeTransferFrom(user1, user2, 23);
-
-    //     assertEq(nftContract.balanceOf(user1), 0);
-    //     assertEq(nftContract.balanceOf(user2), 1);
-    // }
-
     function testSafeTransferFromAccept() external {
         address to = address(receiverContractAccept);
 
