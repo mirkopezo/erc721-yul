@@ -4,6 +4,7 @@ pragma solidity 0.8.17;
 import "forge-std/Test.sol";
 import "../src/ERC721Yul.sol";
 import "../test/mocks/ERC721Receiver.sol";
+import "../test/mocks/ERC721ReceiverData.sol";
 
 contract MyCollection is ERC721Yul {
     function mint(address to, uint256 tokenId) external {
@@ -15,6 +16,7 @@ contract ERC721YulTest is Test {
     MyCollection nftContract;
     ERC721Receiver receiverContractAccept;
     ERC721Receiver receiverContractDecline;
+    ERC721ReceiverData receiverContractData;
 
     address user1 = address(0x1);
     address user2 = address(0x2);
@@ -30,6 +32,7 @@ contract ERC721YulTest is Test {
         nftContract = new MyCollection();
         receiverContractAccept = new ERC721Receiver(true);
         receiverContractDecline = new ERC721Receiver(false);
+        receiverContractData = new ERC721ReceiverData();
     }
 
     function testBalanceOf(address owner) external {
@@ -200,6 +203,10 @@ contract ERC721YulTest is Test {
     function testSafeTransferFrom(address from, address to, uint256 tokenId) external {
         vm.assume(from != address(0) && to != address(0));
         vm.assume(from != to);
+        vm.assume(
+            to.code.length == 0 && to != address(receiverContractDecline)
+                && to != address(receiverContractData)
+        );
 
         nftContract.mint(from, tokenId);
 
@@ -242,5 +249,80 @@ contract ERC721YulTest is Test {
 
         vm.expectRevert();
         nftContract.safeTransferFrom(user1, to, 23);
+    }
+
+    function testSafeTransferFromData(address from, address to, uint256 tokenId) external {
+        vm.assume(from != address(0) && to != address(0));
+        vm.assume(from != to);
+        vm.assume(
+            to.code.length == 0 && to != address(receiverContractDecline)
+                && to != address(receiverContractData)
+        );
+
+        nftContract.mint(from, tokenId);
+
+        assertEq(nftContract.balanceOf(from), 1);
+        assertEq(nftContract.balanceOf(to), 0);
+
+        vm.startPrank(from);
+
+        bytes memory data = abi.encodePacked(bytes4(0xcafebabe));
+
+        nftContract.safeTransferFrom(from, to, tokenId, data);
+
+        assertEq(nftContract.balanceOf(from), 0);
+        assertEq(nftContract.balanceOf(to), 1);
+    }
+
+    function testSafeTransferFromSmallData() external {
+        address to = address(receiverContractData);
+
+        nftContract.mint(user1, 23);
+
+        assertEq(nftContract.balanceOf(user1), 1);
+        assertEq(nftContract.balanceOf(to), 0);
+
+        vm.startPrank(user1);
+
+        bytes memory notExpectedData = abi.encodePacked(bytes6(0x1a0b0c0d0e0f));
+
+        vm.expectRevert();
+        nftContract.safeTransferFrom(user1, to, 23, notExpectedData);
+
+        bytes memory expectedData = abi.encodePacked(bytes6(0x0a0b0c0d0e0f));
+
+        nftContract.safeTransferFrom(user1, to, 23, expectedData);
+
+        assertEq(nftContract.balanceOf(user1), 0);
+        assertEq(nftContract.balanceOf(to), 1);
+    }
+
+    function testSafeTransferFromBigData() external {
+        address to = address(receiverContractData);
+
+        nftContract.mint(user1, 23);
+
+        assertEq(nftContract.balanceOf(user1), 1);
+        assertEq(nftContract.balanceOf(to), 0);
+
+        vm.startPrank(user1);
+
+        bytes memory notExpectedData = abi.encodePacked(
+            bytes32(0x0a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20212223242526272829),
+            bytes8(0x3a2b2c2d2e2f3031)
+        );
+
+        vm.expectRevert();
+        nftContract.safeTransferFrom(user1, to, 23, notExpectedData);
+
+        bytes memory expectedData = abi.encodePacked(
+            bytes32(0x0a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20212223242526272829),
+            bytes8(0x2a2b2c2d2e2f3031)
+        );
+
+        nftContract.safeTransferFrom(user1, to, 23, expectedData);
+
+        assertEq(nftContract.balanceOf(user1), 0);
+        assertEq(nftContract.balanceOf(to), 1);
     }
 }
