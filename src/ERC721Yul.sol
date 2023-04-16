@@ -9,7 +9,7 @@ contract ERC721Yul {
     mapping(uint256 => address) private _tokenApprovals;
     mapping(address => mapping(address => bool)) private _operatorApprovals;
 
-    function transferFrom(address from, address to, uint256 tokenId) external payable {
+    function transferFrom(address from, address to, uint256 tokenId) public payable {
         assembly {
             mstore(0x00, tokenId)
             mstore(0x20, _owners.slot)
@@ -77,7 +77,7 @@ contract ERC721Yul {
         }
     }
 
-    function safeTransferFrom(address from, address to, uint256 tokenId) external payable {
+    function safeTransferFrom(address from, address to, uint256 tokenId) public payable {
         assembly {
             mstore(0x00, tokenId)
             mstore(0x20, _owners.slot)
@@ -169,7 +169,7 @@ contract ERC721Yul {
     }
 
     function safeTransferFrom(address from, address to, uint256 tokenId, bytes calldata data)
-        external
+        public
         payable
     {
         assembly {
@@ -265,7 +265,7 @@ contract ERC721Yul {
         }
     }
 
-    function approve(address to, uint256 tokenId) external payable {
+    function approve(address to, uint256 tokenId) public payable {
         assembly {
             mstore(0x00, tokenId)
             mstore(0x20, _owners.slot)
@@ -304,7 +304,7 @@ contract ERC721Yul {
         }
     }
 
-    function setApprovalForAll(address operator, bool approved) external {
+    function setApprovalForAll(address operator, bool approved) public {
         assembly {
             // Revert if current owner is receiving approval.
             if eq(caller(), operator) { revert(0x00, 0) }
@@ -333,7 +333,7 @@ contract ERC721Yul {
         }
     }
 
-    function balanceOf(address owner) external view returns (uint256) {
+    function balanceOf(address owner) public view returns (uint256) {
         assembly {
             // Revert if address is zero.
             if iszero(owner) { revert(0x00, 0) }
@@ -347,7 +347,7 @@ contract ERC721Yul {
         }
     }
 
-    function ownerOf(uint256 tokenId) external view returns (address) {
+    function ownerOf(uint256 tokenId) public view returns (address) {
         assembly {
             mstore(0x00, tokenId)
             mstore(0x20, _owners.slot)
@@ -363,7 +363,7 @@ contract ERC721Yul {
         }
     }
 
-    function getApproved(uint256 tokenId) external view returns (address) {
+    function getApproved(uint256 tokenId) public view returns (address) {
         assembly {
             mstore(0x00, tokenId)
             mstore(0x20, _owners.slot)
@@ -380,7 +380,7 @@ contract ERC721Yul {
         }
     }
 
-    function isApprovedForAll(address owner, address operator) external view returns (bool) {
+    function isApprovedForAll(address owner, address operator) public view returns (bool) {
         assembly {
             mstore(0x00, owner)
             mstore(0x20, _operatorApprovals.slot)
