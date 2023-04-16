@@ -187,6 +187,7 @@ contract ERC721YulTest is Test {
 
         nftContract.transferFrom(user1, user2, 75);
 
+        // Should revert if caller is not approved.
         vm.expectRevert();
         nftContract.transferFrom(user2, user3, 99);
 
@@ -196,6 +197,7 @@ contract ERC721YulTest is Test {
 
         changePrank(randomCaller);
 
+        // Should revert if caller is not approved.
         vm.expectRevert();
         nftContract.transferFrom(user1, user2, 99);
     }
@@ -247,6 +249,7 @@ contract ERC721YulTest is Test {
 
         vm.startPrank(user1);
 
+        // Should revert if receiver contract does not accept transfer.
         vm.expectRevert();
         nftContract.safeTransferFrom(user1, to, 23);
     }
@@ -286,6 +289,7 @@ contract ERC721YulTest is Test {
 
         bytes memory notExpectedData = abi.encodePacked(bytes6(0x1a0b0c0d0e0f));
 
+        // Should revert if receiver contract does not accept transfer.
         vm.expectRevert();
         nftContract.safeTransferFrom(user1, to, 23, notExpectedData);
 
@@ -312,6 +316,7 @@ contract ERC721YulTest is Test {
             bytes8(0x3a2b2c2d2e2f3031)
         );
 
+        // Should revert if receiver contract does not accept transfer.
         vm.expectRevert();
         nftContract.safeTransferFrom(user1, to, 23, notExpectedData);
 
